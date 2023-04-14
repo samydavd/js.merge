@@ -56,13 +56,21 @@ export function isPlainObject(input: any): boolean {
 	return input && typeof input === 'object' && !Array.isArray(input)
 }
 
+function unsafeValue(object: Record<string, unknown>, key: string) {
+  return (
+    (key === 'constructor' && typeof object[key] === 'function') || 
+    (key == '__proto__')
+  )
+}
+
+
 function _recursiveMerge(base: any, extend: any) {
 
 	if (!isPlainObject(base))
 		return extend
 
 	for (const key in extend) {
-		if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue
+		if (unsafeValue(extend, key)) continue
 		base[key] = (isPlainObject(base[key]) && isPlainObject(extend[key])) ?
 			_recursiveMerge(base[key], extend[key]) :
 			extend[key]
@@ -87,8 +95,8 @@ function _merge(isClone: boolean, isRecursive: boolean, items: any[]) {
 			continue
 
 		for (const key in item) {
-			if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue
-			const value = isClone ? clone(item[key]) : item[key]
+      if (unsafeValue(item, key)) continue;
+      const value = isClone ? clone(item[key]) : item[key]
 			result[key] = isRecursive ? _recursiveMerge(result[key], value) : value
 		}
 

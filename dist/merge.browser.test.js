@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.isPlainObject = exports.clone = exports.recursive = exports.merge = exports.main = void 0;
 module.exports = exports = main;
-exports.default = main;
+exports["default"] = main;
 function main() {
     var items = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -59,11 +59,15 @@ function isPlainObject(input) {
     return input && typeof input === 'object' && !Array.isArray(input);
 }
 exports.isPlainObject = isPlainObject;
+function unsafeValue(object, key) {
+    return ((key === 'constructor' && typeof object[key] === 'function') ||
+        (key == '__proto__'));
+}
 function _recursiveMerge(base, extend) {
     if (!isPlainObject(base))
         return extend;
     for (var key in extend) {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype')
+        if (unsafeValue(extend, key))
             continue;
         base[key] = (isPlainObject(base[key]) && isPlainObject(extend[key])) ?
             _recursiveMerge(base[key], extend[key]) :
@@ -80,7 +84,7 @@ function _merge(isClone, isRecursive, items) {
         if (!isPlainObject(item))
             continue;
         for (var key in item) {
-            if (key === '__proto__' || key === 'constructor' || key === 'prototype')
+            if (unsafeValue(item, key))
                 continue;
             var value = isClone ? clone(item[key]) : item[key];
             result[key] = isRecursive ? _recursiveMerge(result[key], value) : value;
@@ -92,18 +96,53 @@ function _merge(isClone, isRecursive, items) {
 
 /***/ }),
 
-/***/ 186:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 926:
+/***/ ((module) => {
 
+module.exports = chai;
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+var exports = __webpack_exports__;
 var __webpack_unused_export__;
 
 __webpack_unused_export__ = ({ value: true });
-var chai_1 = __webpack_require__(153);
+var chai_1 = __webpack_require__(926);
 var index_1 = __webpack_require__(496);
 describe('merge', function () {
     it('basic', function () {
-        chai_1.assert.deepEqual(index_1.default({ a: 1 }, { b: 2 }), { a: 1, b: 2 });
-        chai_1.assert.deepEqual(index_1.default({ a: 1 }, { b: { c: { d: 2 } } }), { a: 1, b: { c: { d: 2 } } });
+        chai_1.assert.deepEqual((0, index_1.default)({ a: 1 }, { b: 2 }), { a: 1, b: 2 });
+        chai_1.assert.deepEqual((0, index_1.default)({ a: 1 }, { b: { c: { d: 2 } } }), { a: 1, b: { c: { d: 2 } } });
     });
     it('clone', function () {
         var input = {
@@ -130,25 +169,25 @@ describe('merge', function () {
             g: undefined,
             h: true
         };
-        var output = index_1.default(true, input);
+        var output = (0, index_1.default)(true, input);
         input.b.c.d++;
         input.b.c.e[2].z.w = null;
         input.h = null;
         chai_1.assert.deepEqual(original, output);
         input = original;
-        output = index_1.default(true, input, { a: 2 });
+        output = (0, index_1.default)(true, input, { a: 2 });
         chai_1.assert.deepEqual(output.a, 2);
         chai_1.assert.deepEqual(input.a, 1);
     });
     it('invalid input', function () {
-        chai_1.assert.deepEqual(index_1.default(), {});
-        chai_1.assert.deepEqual(index_1.default(undefined), {});
-        chai_1.assert.deepEqual(index_1.default([]), {});
-        chai_1.assert.deepEqual(index_1.default(true), {});
-        chai_1.assert.deepEqual(index_1.default(null, true, [0, 1, 2], 3, { a: 1 }, function () { }, undefined, { b: 2 }), { a: 1, b: 2 });
+        chai_1.assert.deepEqual((0, index_1.default)(), {});
+        chai_1.assert.deepEqual((0, index_1.default)(undefined), {});
+        chai_1.assert.deepEqual((0, index_1.default)([]), {});
+        chai_1.assert.deepEqual((0, index_1.default)(true), {});
+        chai_1.assert.deepEqual((0, index_1.default)(null, true, [0, 1, 2], 3, { a: 1 }, function () { }, undefined, { b: 2 }), { a: 1, b: 2 });
     });
     it('prototype pollution attack', function () {
-        chai_1.assert.deepEqual(index_1.default({}, JSON.parse('{"__proto__": {"a": true}}')), {});
+        chai_1.assert.deepEqual((0, index_1.default)({}, JSON.parse('{"__proto__": {"a": true}}')), {});
     });
 });
 describe('merge.clone', function () {
@@ -203,45 +242,7 @@ describe('merge.recursive', function () {
     });
 });
 
+})();
 
-/***/ }),
-
-/***/ 153:
-/***/ ((module) => {
-
-module.exports = chai;
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	// startup
-/******/ 	// Load entry module
-/******/ 	__webpack_require__(186);
-/******/ 	// This entry module used 'exports' so it can't be inlined
 /******/ })()
 ;
