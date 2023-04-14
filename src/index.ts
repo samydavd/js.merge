@@ -52,7 +52,7 @@ export function clone<T>(input: T): T {
 
 }
 
-export function isPlainObject(input: any): input is Object {
+export function isPlainObject(input: any): boolean {
 	return input && typeof input === 'object' && !Array.isArray(input)
 }
 
